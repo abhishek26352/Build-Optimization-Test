@@ -43,24 +43,24 @@ jobs:
                archive_format: 'zip',
             });
             
-            # let fs = require('fs');
-            # fs.writeFileSync(`${process.env.GITHUB_WORKSPACE}/context.zip`, Buffer.from(download.data));
+            let fs = require('fs');
+            fs.writeFileSync(`${process.env.GITHUB_WORKSPACE}/context.zip`, Buffer.from(download.data));
             
-      # - name: 'Unzip artifact'
-      #   run: unzip context.zip
+      - name: 'Unzip artifact'
+        run: unzip context.zip
 
-      # - name: 'Return Parsed JSON'
-      #   uses: actions/github-script@v6
-      #   id: return-parsed-json
-      #   with:
-      #     script: |
-      #       let fs = require('fs');
-      #       let data = fs.readFileSync('./context.json');
-      #       return JSON.parse(data);
+      - name: 'Return Parsed JSON'
+        uses: actions/github-script@v6
+        id: return-parsed-json
+        with:
+          script: |
+            let fs = require('fs');
+            let data = fs.readFileSync('./context.json');
+            return JSON.parse(data);
 
-      # - name: Print run-id
-      #   run: |
-      #     echo "RUN_ID=${{fromJSON(steps.return-parsed-json.outputs.result).payroll-run-id}}" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8
+      - name: Print run-id
+        run: |
+          echo "RUN_ID=${{fromJSON(steps.return-parsed-json.outputs.result).payroll-run-id}}" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8
       
       - name: Download payroll DLLs from artifact
         uses: actions/download-artifact@v4
