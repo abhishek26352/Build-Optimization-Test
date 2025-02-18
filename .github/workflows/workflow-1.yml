@@ -8,5 +8,5 @@ jobs:
   some_job:  
     runs-on: windows-latest
     steps:
-      - name: Some Step 
+      - name: Some Step
         run: echo "Hello! workflow1"
