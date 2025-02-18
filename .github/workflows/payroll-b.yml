@@ -69,8 +69,11 @@ jobs:
       - name: Download payroll DLLs from artifact
         uses: actions/download-artifact@v4
         with:
-          name: payroll-dll
+          name: payroll-dlls
           path: "${{ github.workspace }}/UltiPro.NET/Distrib/"
           github-token: ${{ github.token }}
           repository: ${{ github.repository }}
           run-id: ${{ needs.download_context_artifact.outputs.property_one }}
+
+      - name: display folder
+        run: dir
