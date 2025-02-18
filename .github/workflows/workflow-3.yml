@@ -1,9 +1,7 @@
 name: Workflow-3
 on:
-  workflow_run:
-    workflows: ["Workflow 1"]
-    types:
-      - completed
+  workflow_dispatch:
+    
     
 jobs:
   some_job:  
