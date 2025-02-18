@@ -1,9 +1,7 @@
 name: Workflow-3
 on:
-  push:
-    branches: ["main"]
   workflow_run:
-    workflows: ["Workflow-2"]
+    workflows: ["Workflow 1"]
     types:
       - completed
     
