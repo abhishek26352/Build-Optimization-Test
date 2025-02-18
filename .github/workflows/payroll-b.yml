@@ -28,6 +28,8 @@ jobs:
                repo: context.repo.repo,
                run_id: context.payload.workflow_run.id,
             });
+
+            console.log("run_id = " + context.payload.workflow_run.id);
             
             let matchArtifact = allArtifacts.data.artifacts.filter((artifact) => {
               return artifact.name == "context.json"
@@ -55,20 +57,9 @@ jobs:
             let data = fs.readFileSync('./context.json');
             return JSON.parse(data);
 
-    outputs:
-      property_one: ${{fromJSON(steps.return-parsed-json.outputs.result).payroll-run-id}}
-
-  run_on_workflow_a_failure:
-    name: Test
-    runs-on: windows-latest
-    needs:
-        - run_on_workflow_a_success
-    steps:
-
       - name: Print run-id
         run: |
-          echo "RUN_ID=${{ needs.run_on_workflow_a_success.outputs.property_one }}" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8
-          echo "run-env-id = ${{ env.RUN_ID }}"
+          echo "RUN_ID=${{fromJSON(steps.return-parsed-json.outputs.result).payroll-run-id}}" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8
       
       - name: Download payroll DLLs from artifact
         uses: actions/download-artifact@v4
@@ -81,3 +72,29 @@ jobs:
 
       - name: display folder
         run: dir
+    
+    outputs:
+      property_one: ${{fromJSON(steps.return-parsed-json.outputs.result).payroll-run-id}}
+
+  # run_on_workflow_a_failure:
+  #   name: Test
+  #   runs-on: windows-latest
+  #   needs:
+  #       - run_on_workflow_a_success
+  #   steps:
+
+  #     - name: Print run-id
+  #       run: |
+  #         echo "RUN_ID=${{ needs.run_on_workflow_a_success.outputs.property_one }}" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8
+      
+  #     - name: Download payroll DLLs from artifact
+  #       uses: actions/download-artifact@v4
+  #       with:
+  #         name: payroll-dlls
+  #         path: "${{ github.workspace }}"
+  #         github-token: ${{ github.token }}
+  #         repository: ${{ github.repository }}
+  #         run-id: ${{ env.RUN_ID }}
+
+  #     - name: display folder
+  #       run: dir
