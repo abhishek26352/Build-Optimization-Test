@@ -19,6 +19,14 @@ jobs:
       - name: Run on workflow A success
         run: echo "Workflow A completes successfully"
 
+      - name: 'Set RUN_ID'
+        uses: actions/github-script@v6
+        with:
+          script: |
+            console.log("new_run_id = " + context.runId);
+            core.exportVariable("NEW_RUN_ID", context.runId);
+
+
       - name: 'Download artifact'
         uses: actions/github-script@v6
         with:
