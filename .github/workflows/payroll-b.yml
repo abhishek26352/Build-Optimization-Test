@@ -5,6 +5,8 @@ on:
     workflows: ["Workflow A"]
     types:
       - completed
+  workflow_dispatch:
+    
 
 jobs:  
   run_on_workflow_a_success:
@@ -70,10 +72,10 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: payroll-dlls
-          path: "${{ github.workspace }}/UltiPro.NET/Distrib/"
+          path: "${{ github.workspace }}"
           github-token: ${{ github.token }}
           repository: ${{ github.repository }}
-          run-id: ${{ needs.download_context_artifact.outputs.property_one }}
+          run-id: 13386908608
 
       - name: display folder
         run: dir
