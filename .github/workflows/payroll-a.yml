@@ -7,17 +7,15 @@ jobs:
     runs-on: windows-latest
     steps:
       - name: Some Step 
-        run: echo "Hello!"
-  job_producing_data:  
-    runs-on: ubuntu-latest
-    steps:
+        run: echo "Hello!"\
+
       - name: Some Step 
         run: |
             printf '{ 
               "prop_1": "Some value",  
               "prop_2": true
             }' >> context.json
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: payroll-dlls.zip
           path: ./*.json
