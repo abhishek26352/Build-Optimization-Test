@@ -2,10 +2,9 @@ name: Workflow 2
 on:
   workflow_run:
     workflows: ["Workflow 1"]
-    types:
-      - completed
-    branches: [ "test" ]
-    
+    types: [completed]
+    branches: [test]
+
 jobs:
   some_job:  
     runs-on: windows-latest
