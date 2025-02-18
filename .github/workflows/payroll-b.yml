@@ -24,7 +24,11 @@ jobs:
         with:
           script: |
             console.log("new_run_id = " + context.runId);
-            core.exportVariable("NEW_RUN_ID", context.runId);
+            core.exportVariable("WORKFLOW_B_RUN_ID", context.runId);
+
+            let workflowARunId = context.payload.workflow_run.id;
+            console.log("Workflow A run_id = " + workflowARunId);
+            core.exportVariable("WORKFLOW_A_RUN_ID", workflowARunId);
 
 
       - name: 'Download artifact'
