@@ -60,7 +60,7 @@ jobs:
     name: Test
     runs-on: windows-latest
     needs:
-        - download_context_artifact
+        - run_on_workflow_a_success
     steps:
       - name: Download payroll DLLs from artifact
         uses: actions/download-artifact@v4
