@@ -1,0 +1,13 @@
+name: Workflow 1
+on:
+  workflow_run:
+    workflows: ["Workflow-3"]
+    types:
+      - completed
+    
+jobs:
+  some_job:  
+    runs-on: windows-latest
+    steps:
+      - name: Some Step 
+        run: echo "Hello!"
