@@ -7,15 +7,20 @@ jobs:
     runs-on: windows-latest
     steps:
       - name: Some Step 
-        run: echo "Hello!"\
+        run: echo "Hello!" >> hello.txt
+
+      - name: Upload payroll DLLs as artifact
+        uses: actions/upload-artifact@v4
+        with:
+         name: payroll-dlls
+         path: "${{ github.workspace }}/*.txt"
 
       - name: Some Step 
         run: |
             printf '{ 
-              "prop_1": "Some value",  
-              "prop_2": true
+              "payroll-run-id": "${{ github.run_id }}" 
             }' >> context.json
       - uses: actions/upload-artifact@v4
         with:
-          name: payroll-dlls
-          path: ./*.json
+          name: context.json
+          path: ./

@@ -5,17 +5,17 @@ on:
     workflows: ["Workflow A"]
     types:
       - completed
-  workflow_dispatch:
-    
 
 jobs:  
   run_on_workflow_a_success:
+    permissions:
+      contents: "read"
+      id-token: "write"
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: windows-latest
     steps:
       - name: Run on workflow A success
         run: echo "Workflow A completes successfully"
-
 
       - name: 'Download artifact'
         uses: actions/github-script@v6
@@ -27,24 +27,46 @@ jobs:
                run_id: context.payload.workflow_run.id,
             });
             
-            # let matchArtifact = allArtifacts.data.artifacts.filter((artifact) => {
-            #   return artifact.name == "context.json"
-            # })[0];
+            let matchArtifact = allArtifacts.data.artifacts.filter((artifact) => {
+              return artifact.name == "context.json"
+            })[0];
             
-            # let download = await github.rest.actions.downloadArtifact({
-            #    owner: context.repo.owner,
-            #    repo: context.repo.repo,
-            #    artifact_id: matchArtifact.id,
-            #    archive_format: 'zip',
-            # });
+            let download = await github.rest.actions.downloadArtifact({
+               owner: context.repo.owner,
+               repo: context.repo.repo,
+               artifact_id: matchArtifact.id,
+               archive_format: 'zip',
+            });
             
-            # let fs = require('fs');
-            # fs.writeFileSync(`${process.env.GITHUB_WORKSPACE}/payroll-dlls.zip`, Buffer.from(download.data));
+            let fs = require('fs');
+            fs.writeFileSync(`${process.env.GITHUB_WORKSPACE}/context.zip`, Buffer.from(download.data));
             
-      # - name: 'Unzip artifact'
-      #   run:  Expand-Archive -Path payroll-dlls.zip -DestinationPath "." -Force
+      - name: 'Unzip artifact'
+        run: unzip context.zip
 
-      - name: "see dll files"
-        run: |
-          dir
-      
+      - name: 'Return Parsed JSON'
+        uses: actions/github-script@v6
+        id: return-parsed-json
+        with:
+          script: |
+            let fs = require('fs');
+            let data = fs.readFileSync('./context.json');
+            return JSON.parse(data);
+
+    outputs:
+      property_one: ${{fromJSON(steps.return-parsed-json.outputs.result).payroll-run-id}}
+
+  run_on_workflow_a_failure:
+    name: Test
+    runs-on: windows-latest
+    needs:
+        - download_context_artifact
+    steps:
+      - name: Download payroll DLLs from artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: payroll-dll
+          path: "${{ github.workspace }}/UltiPro.NET/Distrib/"
+          github-token: ${{ github.token }}
+          repository: ${{ github.repository }}
+          run-id: ${{ needs.download_context_artifact.outputs.property_one }}
