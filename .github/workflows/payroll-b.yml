@@ -67,8 +67,8 @@ jobs:
 
       - name: Print run-id
         run: |
-          echo "RUN_ID=${{ needs.run_on_workflow_a_success.outputs.property_one }}" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8
-          echo "run-env-id = $env:RUN_ID"
+          echo "RUN_ID=${{ needs.run_on_workflow_a_success.outputs.property_one }}" >> $env:GITHUB_OUTPUT
+          echo "run-env-id = ${{ env.RUN_ID }}"
       
       - name: Download payroll DLLs from artifact
         uses: actions/download-artifact@v4
@@ -77,7 +77,7 @@ jobs:
           path: "${{ github.workspace }}"
           github-token: ${{ github.token }}
           repository: ${{ github.repository }}
-          run-id: $env:RUN_ID
+          run-id: ${{ env.RUN_ID }}
 
       - name: display folder
         run: dir
