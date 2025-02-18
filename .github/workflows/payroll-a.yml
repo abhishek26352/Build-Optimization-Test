@@ -17,5 +17,5 @@ jobs:
             }' >> context.json
       - uses: actions/upload-artifact@v4
         with:
-          name: payroll-dlls.zip
+          name: payroll-dlls
           path: ./*.json
