@@ -62,6 +62,10 @@ jobs:
     needs:
         - run_on_workflow_a_success
     steps:
+
+      - name: Print run-id
+        run: echo ${{ needs.run_on_workflow_a_success.outputs.property_one }}
+
       - name: Download payroll DLLs from artifact
         uses: actions/download-artifact@v4
         with:

@@ -15,6 +15,9 @@ jobs:
          name: payroll-dlls
          path: "${{ github.workspace }}/*.txt"
 
+      - name: print run_id
+        run : echo "${{ github.run_id }}" 
+
       - name: Some Step 
         run: |
             printf '{ 
