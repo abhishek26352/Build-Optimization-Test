@@ -10,4 +10,4 @@ jobs:
     runs-on: windows-latest
     steps:
       - name: Some Step 
-        run: echo "Hello! workflow2"
+        run: echo "Hello! workflow2 test"
