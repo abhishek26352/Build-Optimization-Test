@@ -20,12 +20,3 @@ jobs:
       - name: print run_id
         run : echo "${{ github.run_id }}" 
 
-      - name: Some Step 
-        run: |
-            printf '{ 
-              "payroll-run-id": "${{ github.run_id }}" 
-            }' >> context.json
-      - uses: actions/upload-artifact@v4
-        with:
-          name: context.json
-          path: ./

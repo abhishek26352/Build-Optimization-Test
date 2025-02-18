@@ -23,7 +23,6 @@ jobs:
         uses: actions/github-script@v6
         with:
           script: |
-
             let workflowARunId = context.payload.workflow_run.id;
             console.log("Workflow A run_id = " + workflowARunId);
             core.exportVariable("WORKFLOW_A_RUN_ID", workflowARunId);
@@ -86,26 +85,3 @@ jobs:
     
     # outputs:
       # property_one: ${{fromJSON(steps.return-parsed-json.outputs.result).payroll-run-id}}
-
-  # run_on_workflow_a_failure:
-  #   name: Test
-  #   runs-on: windows-latest
-  #   needs:
-  #       - run_on_workflow_a_success
-  #   steps:
-
-  #     - name: Print run-id
-  #       run: |
-  #         echo "RUN_ID=${{ needs.run_on_workflow_a_success.outputs.property_one }}" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8
-      
-  #     - name: Download payroll DLLs from artifact
-  #       uses: actions/download-artifact@v4
-  #       with:
-  #         name: payroll-dlls
-  #         path: "${{ github.workspace }}"
-  #         github-token: ${{ github.token }}
-  #         repository: ${{ github.repository }}
-  #         run-id: ${{ env.RUN_ID }}
-
-  #     - name: display folder
-  #       run: dir
