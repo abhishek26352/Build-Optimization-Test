@@ -1,4 +1,4 @@
-name: Workflow-2
+name: Test-2
 on:
   workflow_call:
 
@@ -6,5 +6,10 @@ jobs:
   payroll-unitTest:  
     runs-on: windows-latest
     steps:
-      - name: Some Step
-        run: echo "Hello! workflow2 test"
+      - name: Download hello.txt artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: hello-artifact
+
+      - name: Display hello.txt content
+        run: type hello.txt

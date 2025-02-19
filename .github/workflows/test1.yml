@@ -1,4 +1,4 @@
-name: Workflow-1
+name: Test-1
 on:
   workflow_call:
 
@@ -6,5 +6,11 @@ jobs:
   payroll-MSbuild:  
     runs-on: windows-latest
     steps:
-      - name: Some Step
-        run: echo "Hello! workflow1 test"
+      - name: Create hello.txt
+        run: echo "Hello from Test-1!" > hello.txt
+
+      - name: Upload hello.txt as an artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: hello-artifact
+          path: hello.txt
