@@ -5,14 +5,13 @@ on:
   workflow_dispatch:
     
 jobs:
-  start-build:
-    runs-on: windows-latest
-    steps:
-      - name: Some Step
-        run: echo "Hello! start build"
+  # start-build:
+  #   runs-on: windows-latest
+  #   steps:
+  #     - name: Some Step
+  #       run: echo "Hello! start build"
 
   call-payroll-build:
-    needs: start-build
     uses: ./.github/workflows/test1.yml
     secrets: inherit
 
@@ -21,7 +20,7 @@ jobs:
     uses: ./.github/workflows/test2.yml
     secrets: inherit
 
-  # call-ues-build:
-  #   needs: call-payroll-build
-  #   uses: ./.github/workflows/test3.yml
-  #   secrets: inherit
+  call-ues-build:
+    needs: call-payroll-build
+    uses: ./.github/workflows/test3.yml
+    secrets: inherit
