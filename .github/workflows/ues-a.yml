@@ -1,0 +1,137 @@
+name: Building UES || Test
+
+on:
+  workflow_run:
+    workflows: [Payroll || Test A]
+    types:
+      - completed
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: [garm, dev, us-east4, vm, windows, medium]
+
+    steps:
+      - name: Enable long path support
+        run: git config --global core.longpaths true
+        
+      - name: checkout
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            UES/Services/Core
+            UES/UES/Ues.SimpleConsole
+            UES/UESApplications
+            UES/Shared
+            UltiPro.NET/Distrib/Mappings
+            UltiPro.NET/Distrib/MetaPlatformData
+
+      # - name: Changing working directory
+      #   run: |
+      #       # Correct PowerShell path usage
+      #       Move-Item "C:\actions-runner\_work\ukgpro-core-gha\ukgpro-core-gha\*" "C:\actions-runner\_work\ukgpro-core-gha\"
+      #       Remove-Item "C:\actions-runner\_work\ukgpro-core-gha\ukgpro-core-gha" -Force          
+                
+
+      # - name: Install MSBuild 17
+      #   uses: microsoft/setup-msbuild@v2
+      #   with:
+      #     vs-version: '17.0'
+      #     msbuild-architecture: 'x86'
+
+      - name: Install NuGet CLI
+        run: |
+          $nugetPath = "$env:ProgramFiles\NuGet"
+          if (-Not (Test-Path $nugetPath)) {
+            New-Item -Path $nugetPath -ItemType Directory
+          }
+          Invoke-WebRequest -Uri https://dist.nuget.org/win-x86-commandline/v3.4.4/nuget.exe -OutFile nuget.exe
+          Move-Item nuget.exe -Destination "$nugetPath\nuget.exe"   
+
+      - name: Enable long paths in Git
+        run: git config --system core.longpaths true
+      
+      - name: Enable long paths in Windows Registry
+        shell: powershell
+        run: |
+          New-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control\FileSystem" `
+          -Name "LongPathsEnabled" -Value 1 -PropertyType DWORD -Force
+
+      - name: Restore NuGet Packages
+        run: |
+          & "$env:ProgramFiles\NuGet\nuget.exe" restore ".\UES\UESApplications\UESApplications.sln" -Project2ProjectTimeOut 300 -DisableParallelProcessing -Source https://ukgartifactory.pe.jfrog.io/artifactory/api/nuget/v3/pro-nuget-gallery
+          dir "${{ github.workspace }}\UES\UESApplications\packages"
+        continue-on-error: true  
+
+      
+      - name: Download and extract required dlls from teamcity
+        run: |
+
+            #1 Payroll
+            curl.exe --ssl-no-revoke -o artifacts_Payroll.zip -fsSL "https://teamcity.dev.us.corp/guestAuth/app/rest/builds/id:69914509/artifacts/archived"
+            Expand-Archive -Path artifacts_Payroll.zip -DestinationPath "${{ github.workspace }}\UES\Distrib" -Force
+           
+            #2 Compensation Management
+            curl.exe --ssl-no-revoke -o artifacts_Compensation_Management.zip -fsSL "https://teamcity.dev.us.corp/guestAuth/app/rest/builds/id:69898684/artifacts/archived"
+            Expand-Archive -Path artifacts_Compensation_Management.zip -DestinationPath "${{ github.workspace }}\UES\Distrib" -Force 
+
+            #3 MetaPlatform
+            curl.exe --ssl-no-revoke -o artifacts_MetaPlatform.zip -fsSL "https://teamcity.dev.us.corp/guestAuth/app/rest/builds/id:69898677/artifacts/archived"
+            Expand-Archive -Path artifacts_MetaPlatform.zip -DestinationPath "${{ github.workspace }}\UES\Distrib" -Force
+
+            #4 Talent
+            curl.exe --ssl-no-revoke -o artifacts_Talent.zip -fsSL "https://teamcity.dev.us.corp/guestAuth/app/rest/builds/id:69898678/artifacts/archived"
+            Expand-Archive -Path artifacts_Talent.zip -DestinationPath "${{ github.workspace }}\UES\Distrib" -Force 
+
+            #5 UES
+            curl.exe --ssl-no-revoke -o artifacts_UES.zip -fsSL "https://teamcity.dev.us.corp/guestAuth/app/rest/builds/id:69898681/artifacts/archived"
+            Expand-Archive -Path artifacts_UES.zip -DestinationPath "${{ github.workspace }}\UES\Distrib" -Force
+
+            #6 WinApps
+            curl.exe --ssl-no-revoke -o artifacts_WinApps.zip -fsSL "https://teamcity.dev.us.corp/guestAuth/app/rest/builds/id:69898682/artifacts/archived"
+            Expand-Archive -Path artifacts_WinApps.zip -DestinationPath "${{ github.workspace }}\UES\Distrib" -Force
+
+            #7 WebControls
+            curl.exe --ssl-no-revoke -o artifacts_WebControls.zip -fsSL "https://teamcity.dev.us.corp/guestAuth/app/rest/builds/id:69898676/artifacts/archived"
+            Expand-Archive -Path artifacts_WebControls.zip -DestinationPath "${{ github.workspace }}\UES\Distrib" -Force   
+
+            #8 ObjectModel
+            curl.exe --ssl-no-revoke -o artifacts_ObjectModel.zip -fsSL "https://teamcity.dev.us.corp/guestAuth/app/rest/builds/id:69898670/artifacts/archived"
+            Expand-Archive -Path artifacts_ObjectModel.zip -DestinationPath "${{ github.workspace }}\UES\Distrib" -Force
+
+            #9 Foundation
+            curl.exe --ssl-no-revoke -o artifacts_Foundation.zip -fsSL "https://teamcity.dev.us.corp/guestAuth/app/rest/builds/id:69898669/artifacts/archived"
+            Expand-Archive -Path artifacts_Foundation.zip -DestinationPath "." -Force
+            Expand-Archive -Path foundation.zip -DestinationPath "${{ github.workspace }}\UES\Distrib" -Force
+
+            #10 Interops
+            curl.exe --ssl-no-revoke -o artifacts_Interops.zip -fsSL "https://teamcity.dev.us.corp/guestAuth/app/rest/builds/id:69898668/artifacts/archived"
+            Expand-Archive -Path artifacts_Interops.zip -DestinationPath "." -Force
+            Expand-Archive -Path interops.zip -DestinationPath "${{ github.workspace }}\UES\Shared\Interops" -Force
+            
+
+      - name: Build the Application
+        run: |
+          & "C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\MSBuild\Current\Bin\MSBuild.exe" "${{ github.workspace }}\UES\UESApplications\UESApplications.sln" -t:Build -p:Configuration=Release -p:RuntimeIdentifiers=x86 /bl:msbuild.binlog
+      
+      # - name: Download NUnit
+      #   run: |
+      #     Invoke-WebRequest -Uri "https://github.com/nunit-legacy/nunitv2/releases/download/2.6.5/NUnit-2.6.5.zip" -OutFile "NUnit.Console.zip"
+      #     Expand-Archive -Path "NUnit.Console.zip" -DestinationPath "$env:GITHUB_WORKSPACE\NUnit"
+      #   shell: powershell
+
+      # - name: Run NUnit Tests
+      #   run: |
+      #     cd "${{ github.workspace }}\NUnit\NUnit-2.6.5\bin"
+      #     .\nunit-console.exe "${{ github.workspace }}\UltiPro.NET\Distrib\UltimateSoftware.Payroll.Tests.dll" /include="NonDB,Unit" /Output=dotCover.dcvr /framework=4.0
+      #     if ($LASTEXITCODE -ne 0) {
+      #         Write-Host "::error::Some NUnit tests failed"
+      #     }
+      #   continue-on-error: true
+
+      - name: Upload Build Log Artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: msbuild-log
+          path: msbuild.binlog

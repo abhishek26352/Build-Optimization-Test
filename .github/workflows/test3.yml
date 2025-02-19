@@ -1,0 +1,10 @@
+name: Workflow-3
+on:
+  workflow_call:
+
+jobs:
+  some_job:  
+    runs-on: windows-latest
+    steps:
+      - name: Some Step
+        run: echo "Hello! workflow3 test"
