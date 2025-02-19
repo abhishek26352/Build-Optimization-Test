@@ -3,7 +3,7 @@ on:
   workflow_call:
 
 jobs:
-  some_job:  
+  ues-MSbuild:  
     runs-on: windows-latest
     steps:
       - name: Some Step
