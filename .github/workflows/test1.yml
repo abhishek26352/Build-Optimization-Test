@@ -11,9 +11,11 @@ jobs:
         run: echo "Hello! workflow1"
 
   call-workflow-2:
+    needs: some_job
     uses: ./.github/workflows/test2.yml  # Calls Workflow-2
     secrets: inherit  # Use this if secrets are required
 
   call-workflow-3:
+    needs: some_job
     uses: ./.github/workflows/test3.yml  # Calls Workflow-3
     secrets: inherit  # Use this if secrets are required
